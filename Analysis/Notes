@@ -1,0 +1,37 @@
+Notes:
+
+What is the best model for the export data? How do you define "best"?
+Which forecast model is the best? How do you define "best"?
+More than one model may be equally good. How do you choose among equally good models?
+
+
+Assess composition of time series
+Use following functions as appropriate
+Ses (simple exponential smoothing)
+holt (with or without exponential = TRUE and damped = TRUE)
+hw (with or without exponential = TRUE and damped = TRUE)
+
+
+ME – mean error 
+RMSE – root mean squared error
+MAE – mean absolute error
+MPE – mean percentage error
+MAPE – mean absolute percentage error
+MASE – mean absolute scaled error
+ACF1 – autocorrelation errors at lag 1
+Theil’s U
+
+A low value of the ME may conceal forecasting inaccuracy due to the offsetting effect of large positive and negative forecast errors. 
+The MSE and MAE may overcome the 'cancellation of positive and negative errors' limitation of the ME, but they fail to provide information on forecasting accuracy relative to the scale of the series examined. 
+The MSE places a greater penalty on large forecast errors than the MAE. 
+The more accurate the forecasts, the lower the value of the U1 statistic.
+Even the simplest forecast evaluation statistic provides useful information. For example, the ME provides information on bias.
+The full range of statistics needs to be considered for a complete analysis of the accuracy of forecasts.
+
+----------------------------------------------------------------------
+The code is there, but it is not interpreted.
+Your job
+Section the code into modules for importing data, cleaning/modifying data, exploring data, analyzing data
+Add interpretation
+Determine which model is best
+Give a conclusion of your analysis as far as forecasting exports for Chulwalar.

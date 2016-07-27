@@ -1,0 +1,241 @@
+---
+title: "6306_CaseStudy_Unit10"
+author: "Manjula Kottegoda, Ryan Kelly, Jean Jecha"
+date: "July 26, 2016"
+output: 
+  html_document:
+    keep_md: true
+---
+
+## Case study
+
+Chulwalar is part of the island group Urbano in the northern hemisphere. They 
+are famous for their plants which flower in winter. There are three main plants
+that Chulwalar exports.
+
+1. Efak - a leafy bush with white flowers
+2. Wuge - a grassy  plant with tiny pink flowers
+3. Etel - a flowering tree (red or blue)
+
+Exports generally are higher towards the end of the year. Chulwalar celebrates its independence on 1st December each year. On this day it
+is custom to give presents to family and friends. Chulwalar also celebrates the March Equinox as a time of rebirth in the northern hemisphere.  
+
+>In this case study we will be performing analysis and forecasting  exports for **Wuge flowers** for 2014 based on the 2013 As-Is, Planned and Influencing data. We will be analyzing  the data, running it through a variety of forecasting models and picking the best model for the case. In closing we will provide some insight on the data and export forecasting of **Wuge flowers** using the selected model.
+
+
+
+```{r echo=FALSE, include=FALSE}
+#------------------------------------------------------------------------------
+#Setup Environment - Load required Packages and setwd
+#------------------------------------------------------------------------------
+
+library(fpp) # for time series forecasting and analysis
+library(forecast) # for some other forecasting models
+mydirectory <- 'C:/R_Git_Local/6306_CaseStudy_Unit10'
+setwd(mydirectory)
+```
+
+## Data Import
+
+First we load the 2013 data provided by the government of Chulwalar. The raw  data files will be as follows.
+
+Data file | Description
+------------- | -----------------------------------------------------
+ImportedAsIsData | observed exports data. Monthly and Annual breakdown by flower type and totals
+ImportedPlanData | desired results data.Monthly and Annual breakdown by flower type and totals
+ImportedIndicators | factors influencing the exports 
+
+
+```{r}
+#------------------------------------------------------------------------------
+# Data Import, Vector assignments and Time series transformations done in this module
+#------------------------------------------------------------------------------
+source('Analysis/Data_Import_module.R') 
+str(ImportedAsIsData) # Official Chulwalar observed exports data 
+str(ImportedPlanData) # Official Chulwalar desired results data
+str(ImportedIndicators) # Official Chulwalar influencing factors data
+
+#------------------------------------------------------------------------------
+# A quick look at the Wuge data vectors
+#------------------------------------------------------------------------------
+str(WugeAsIsVector) # observed exports raw data
+str(WugePlanVector) # desired results raw data
+```
+
+We will now look at the Wuge data that was transformed into a time series. 
+
+```{r}
+#------------------------------------------------------------------------------
+# A quick look at the As-is and planned time series data 
+#------------------------------------------------------------------------------
+str(WugeAsIs)  # observed exports time series data
+str(WugePlan)  # desired results time series data
+```
+
+
+
+## Data exploration
+
+```{r fig.width=16, fig.height=8}
+#------------------------------------------------------------------------------
+# Data analysis code can be found in this module
+#------------------------------------------------------------------------------
+source('Analysis/Data_Analysis_module.R') 
+```
+
+
+
+### Correlation between As Is and Plan Data for Wuge 
+
+We can see a possible relationship from the plots above. So the correlation between *As-Is* and *Plan* data is now examined to determine the accuracy of the *Plan*  data. Correlation is a measure of a linear relationship between two variables. 
+
+
+It is observed that the correlation coefficient is **`r cor_WugeAsIs_Plan`**  indicating a strong relationship between *As-Is* & *Plan* data. In other words planning accuracy is quite good for the Wuge data. Plotting the two time series together confirms the strong relationship.
+
+```{r}
+plot(WugeAsIs, col="blue", main="Wuge As-Is and Plan",  lwd=2)
+lines(WugePlan, col="Green", lwd=2)
+legend("topleft",lwd=2, pch=1, col=c('blue','green'), c("As-Is","Plan"))
+```
+
+Now we look at the statistics of the Linear fit.
+```{r}
+summary(WugeAsIs_lm)
+```
+With a small p-value the results show a very high planning accuracy. 
+
+
+
+
+
+
+### Using STL function we now decompose the data into seasonal, trend and remainder components using loess.
+
+The Wuge time series can be analyzed further after separating it by trend, seasonality and remainder components. 
+
+```{r}
+#------------------------------------------------------------------------------
+# Plot data, seasonal, trend, and remainder plots together
+#------------------------------------------------------------------------------
+plot(WugeAsIs_stl, col="black", main="Wuge As-Is decomposed plots") # Use STL function for decomposition and then plot the separated patterns
+```
+
+The plots clearly show a pattern with time making the Wuge flower a good candidate for forecasting with high accuracy.
+
+Looking at the trend plot separately for the Wuge flower, an almost linear trend with a mild dip in 2009 and 2012 timeframe can be seen. Possible influenced by external indicators.
+
+```{r}
+options(scipen=5)
+plot(WugeAsIs_stl$time.series[,"trend"], ylab="Wuge As Is trend",col="blue")
+```
+
+
+The monthplot (below) shows that September is the highest yielding month while July is the lowest. Also the year-end yields are generally higher.
+
+```{r}
+monthplot(WugeAsIs_stl$time.series[,"seasonal"], main="", ylab="Seasonal" )
+```
+
+
+
+
+
+
+## Correlation with external indicators
+
+
+The indicators will be converted into individual  vectors and subsequently converted into time series. The correlation of the indicators will then be tested against the As Is exports for the Wuge flower. 
+
+
+```{r}
+#------------------------------------------------------------------------------
+# Correlation of different external indicators code can be found in this module
+#------------------------------------------------------------------------------
+source('Analysis/External_Indicators_Analysis.R') 
+```
+
+Listed below are the Correlation coefficients for the external indicators in descending order.
+
+external indicators | Correlation Coefficient
+------------- | -----------------------------------------------------
+Monthly Change in Export Price Index (CEPI)           | `r cor(WugeAsIs, CEPI)`
+Yearly number of Globalisation Party members in Chulwalar | `r cor(WugeAsIs, GlobalisationPartyMembers)`
+Monthly Average Export Price Index for Chulwalar          | `r cor(WugeAsIs, AEPI)`
+Yearly Exports from Urbano                            | `r cor(WugeAsIs, UrbanoExports)`
+Monthly Satisfaction Index (SI) external index        | `r cor(WugeAsIs, SIExtern)`
+Chulwalar Index (Total value of all companies in Chulwalar) | `r cor(WugeAsIs, ChulwalarIndex)`
+Monthly Producer Price Index (PPI) for Etel in Chulwalar  | `r cor(WugeAsIs, PPIEtel)`
+Proposed spending for National Holidays               | `r cor(WugeAsIs, IndependenceDayPresents)`
+Influence of National Holiday                         | `r cor(WugeAsIs, InfluenceNationalHolidays)`
+Monthly Satisfaction Index (SI) government based data | `r cor(WugeAsIs, SIGov)`
+National Holidays                                     | `r cor(WugeAsIs, NationalHolidays)`
+Monthly Inflation rate in Chulwalar                   | `r cor(WugeAsIs, Inflation)`
+Monthly births in Chulwalar                           | `r cor(WugeAsIs, Births)`
+Average monthly temperatures in Chulwalar             | `r cor(WugeAsIs, Temperature)`
+
+
+From the correlation table (above) we can say that the *Monthly Change in Export Price Index (CEPI)*, *Yearly number of Globalisation Party members Index*, *Monthly Average Export Price Index* and *Yearly Exports* all have a moderate influence on the Wuge data. We can also see a general downward trend for 2009 and also a flat trend in 2012 for several indicators which might explain the mild dip we saw in the Wuge linear trend. 
+
+Other indices do not show any particular correlation with Wuge export data.
+
+
+
+## Forecasting models with smoothing and related approaches
+
+
+Now we explore some forecasting models to find which model fits Wuge forecasting the best. 
+
+
+
+
+```{r}
+#------------------------------------------------------------------------------
+#  Data Modeling code done in this section
+#------------------------------------------------------------------------------
+source('Analysis/Data_modeling_module2.R') 
+```
+
+We will now plot the the Akaike’s Information Criterion (AIC/AICc) and the Bayesian Information Criterion (BIC) values for the methods.
+
+
+```{r warning=FALSE}
+#------------------------------------------------------------------------------
+#  Error criterion analysis for chosen models done here 
+#------------------------------------------------------------------------------
+source('Analysis/Error_Criterion_Analysis.R') 
+```
+
+
+
+We noticed earlier, from the decomposed Seasonal Trend plots, that there was a clear seasonal and linear trend to the Wuge data series. Therefore the Simple Exponential Smoothing (SES) method that gives a flat forecast is not the ideal model for this case.
+
+
+Holt's linear trend and exponential trend models predict a constant growth rate and usually end up over forecasting. Even when using dampening Holt's linear and exponential methods do not accommodate seasonality all that well. Therefore for the Wuge dataset with a prominent seasonal trend the Holt's linear and exponential models are not a good fit.
+
+Now we consider the Holt-Winter's seasonal methods which have additive, multiplicative versions. The difference being that the additive method fits a constant seasonal variance better. Again referring to the Seasonal Trend decomposed plots we can notice that the seasonal variation was not constant with time. The seasonal variation looks to have a slight increase with time. The Holt-Winter's Multiplicative method with the proportional seasonal variation adjustment seems to fit the Wuge data series the best.
+ 
+
+
+```{r}
+#--------------------------------------------
+#  Seasonal models side by side (Holt-Winter's Additive vs. Multiplicative)
+#------------------------------------------------------------------------------
+states <- cbind (Model_hw_1$model$states[,1:3],Model_hw_2$model$states[,1:3])
+colnames(states) <- c("level","slope","seasonal","level","slope","seasonal")
+plot(states,xlab ="Year", main="Holt-Winter's Additive vs. Multiplicative")
+
+```
+
+
+Even on the Holt-Winter's Additive vs. Multiplicative side-by-side (above) we can see the level trend of the Multiplicative shadow the Wuge As-Is data slightly better than the Additive model. Furthermore the mean observed minus predicted (a.k.a mean residual) values of Holt-Winter's Additive model comes out to be **`r mean(Model_hw_1$residuals)`** while the residuals of Holt-Winter's Multiplicative model is much closer to zero and is **`r mean(Model_hw_2$residuals)`**.  In conclusion Holt-Winter's Multiplicative model is the better fit and should in theory will give a better forecast prediction over time.
+
+In conclusion based on the chosen method we can now forecast the Wuge for 2014 as below.
+
+```{r}
+#------------------------------------------------------------------------------
+#  Forecast using the preferred model
+#------------------------------------------------------------------------------
+Model_hw_2$mean # Mean export prediction for the upcoming year
+plot(Model_hw_2$mean,xlab ="Year", main="Holt-Winter's Multiplicative prediction for 2014", ylab="Wuge export amount")
+
+```
