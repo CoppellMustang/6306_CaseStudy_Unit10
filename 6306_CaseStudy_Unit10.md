@@ -15,7 +15,7 @@ that Chulwalar exports.
 Exports generally are higher towards the end of the year. Chulwalar celebrates its independence on 1st December each year. On this day it
 is custom to give presents to family and friends. Chulwalar also celebrates the March Equinox as a time of rebirth in the northern hemisphere.  
 
->In this case study we will be performing analysis and forecasting  exports for **Wuge flowers** for 2014 based on the 2013 As-Is, Planned and Influencing data. We will be analyzing  the data, running it through a variety of forecasting models and picking the best model for the case. In closing we will provide some insight on the data and export forecasting of **Wuge flowers** using the selected model.
+>In this case study we will be performing analysis and forecasting  exports for **Wuge flowers** for 2014 based on the 2008-2013 As-Is, Planned and Influencing data. We will be analyzing  the data, running it through a variety of forecasting models and picking the best model for the case. In closing we will provide some insight on the data and export forecasting of **Wuge flowers** using the selected model.
 
 
 
@@ -23,7 +23,7 @@ is custom to give presents to family and friends. Chulwalar also celebrates the 
 
 ## Data Import
 
-First we load the 2013 data provided by the government of Chulwalar. The raw  data files will be as follows.
+First we load the 2008-2013 data provided by the government of Chulwalar. The raw  data files will be as follows.
 
 Data file | Description
 ------------- | -----------------------------------------------------
